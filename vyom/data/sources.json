@@ -1,0 +1,39 @@
+{
+  "sources": [
+    {
+      "id": "celestrak",
+      "name": "CelesTrak GP/OMM",
+      "type": "Public Orbit Catalog",
+      "url": "https://celestrak.org/NORAD/documentation/gp-data-formats.php",
+      "usage": "Primary normalized orbit mean elements and satellite catalog data."
+    },
+    {
+      "id": "space_track",
+      "name": "Space-Track API",
+      "type": "US Space Force Catalog",
+      "url": "https://www.space-track.org/documentation",
+      "usage": "Official public satellite & cataloged debris surveillance records."
+    },
+    {
+      "id": "esa_discos",
+      "name": "ESA DISCOS Database",
+      "type": "Space Object Characterization",
+      "url": "https://discosweb.esoc.esa.int/",
+      "usage": "Object metadata, launch history, mass, cross-sectional area, and hard-body dimensions."
+    },
+    {
+      "id": "nasa_ordem",
+      "name": "NASA ORDEM 3.2",
+      "type": "Statistical Debris Engineering Model",
+      "url": "https://orbitaldebris.jsc.nasa.gov/modeling/ordem.html",
+      "usage": "Statistical debris flux and directional impact modeling for sub-10-cm particles."
+    },
+    {
+      "id": "noaa_swpc",
+      "name": "NOAA Space Weather Prediction Center",
+      "type": "Space Environment Indices",
+      "url": "https://www.spaceweather.gov/impacts/satellite-drag",
+      "usage": "Solar activity (Kp index, F10.7) for thermospheric density & satellite drag modeling."
+    }
+  ]
+}
