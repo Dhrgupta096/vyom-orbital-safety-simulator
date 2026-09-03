@@ -1,7 +1,20 @@
 # 📡 VYOM — Real-Time 3D Space Debris Tracking & Threat Intelligence Radar
 
-> **Bharatiya Antariksh Hackathon (BAH)**  
+> 🏆 **2nd PRIZE WINNER — Bharatiya Antariksh Hackathon (BAH)**  
+> 🎓 **Dayananda Sagar University (DSU)**  
 > *Autonomous Multi-Sensor Orbital Debris Fusion, Keep-Out Volume Protection & 20-Year Decay Trajectory Engine*
+
+---
+
+## 🏆 Hackathon Achievement & Team Credits
+
+**VYOM** ("Space Debris Tracking & Threat Intelligence System") secured **2nd Prize** at the prestigious **Bharatiya Antariksh Hackathon (BAH)**!
+
+### 👥 Team Members (Dayananda Sagar University):
+- 👨‍💻 **Dhruv Gupta**
+- 👩‍💻 **Ayushi J**
+- 👨‍💻 **Dhanush J**
+- 👩‍💻 **Kamya**
 
 ---
 
@@ -82,7 +95,7 @@ Observe 3D cyan wireframe protective spheres surrounding the **ISS** and **Tiang
 
 ## 🛠️ System Architecture & Technology Stack
 
-- **Frontend 3D Rendering**: Three.js (WebGL), OrbitControls, CSS3 Glassmorphism
+- **Frontend 3D Rendering**: Three.js (WebGL), OrbitControls, CSS3 Glassmorphic UI
 - **Backend Server**: Python 3 (FastAPI / Standard Library REST API Server)
 - **Physics Engine**: Python 3 SGP4 orbital propagator, 20-Year Decay Thermospheric Engine, and 2D B-Plane encounter calculator
 - **Data Provenance**: CelesTrak, Space-Track, ESA DISCOS, NASA ORDEM 3.2, NOAA SWPC, and ESA TIRA 34m Radar
@@ -114,4 +127,4 @@ Observe 3D cyan wireframe protective spheres surrounding the **ISS** and **Tiang
 
 ---
 
-## 🇮🇳 Developed for Bharatiya Antariksh Hackathon (BAH)
+## 🇮🇳 Developed for Bharatiya Antariksh Hackathon (BAH) — Dayananda Sagar University
