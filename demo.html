@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VYOM ORBITAL RADAR — Live Interactive Public Demo</title>
+  
+  <link rel="stylesheet" href="vyom/ui/styles.css">
+  
+  <!-- Three.js & OrbitControls CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <!-- ENTRANCE SPLASH MODAL OVERLAY (OrbitalRadar Screenshot Clone) -->
+  <div id="entrance-modal-overlay">
+    <div class="entrance-card">
+      <div class="entrance-icon">📡</div>
+      <div class="entrance-title">VYOM ORBITAL RADAR</div>
+      <div class="entrance-subtitle">Intelligent Space Debris & Management System (Live Public Demo).</div>
+      
+      <div class="loading-bar-track">
+        <div class="loading-bar-fill" id="splash-progress-bar"></div>
+      </div>
+      
+      <div class="loading-status-text">
+        Loading multi-regime space debris... <span id="splash-progress-num" style="color:var(--or-yellow); font-weight:700;">0%</span>
+      </div>
+      <div style="font-family:var(--font-mono); font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:1.5px;">
+        INITIALIZING LIVE 3D ORBITAL SIMULATOR...
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D WebGL Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- ONSCREEN ZOOM CONTROLS ([ + ] / [ − ] / [ RESET ]) -->
+  <div class="zoom-controls-float">
+    <button class="zoom-btn" id="btn-zoom-in" title="Zoom In">+</button>
+    <button class="zoom-btn" id="btn-zoom-out" title="Zoom Out">−</button>
+    <button class="zoom-btn" id="btn-zoom-reset" title="Reset View">🎯</button>
+  </div>
+
+  <!-- LEFT HAMBURGER MENU BUTTON -->
+  <button id="left-hamburger-btn" class="hamburger-left" aria-label="Open tracking menu">
+    ☰
+  </button>
+
+  <!-- LEFT SLIDEOUT MENU PANEL -->
+  <div id="left-hamburger-panel" class="hamburger-panel-left open">
+    <div class="hm-section-label">
+      <span>VYOM MULTI-REGIME RADAR</span>
+      <span style="font-size:10px; color:var(--or-yellow);" id="catalog-count">200+ OBJECTS</span>
+    </div>
+
+    <div class="filter-tabs">
+      <button class="tab-btn active" data-tab="ALL">ALL</button>
+      <button class="tab-btn" data-tab="ACTIVE">ACTIVE</button>
+      <button class="tab-btn" data-tab="DEBRIS">DEBRIS</button>
+    </div>
+
+    <div class="hm-section-label">NEARBY SPACE OBJECT CATALOG</div>
+    <div id="satellite-list">
+      <!-- Dynamic cards loaded by app.js -->
+    </div>
+
+    <div class="hm-section-label" style="margin-top: 10px;">PROTECTED KEEP-OUT VOLUMES</div>
+    <div style="font-size: 11px; color: var(--or-emerald); padding: 4px 0;">
+      STATION SHIELDS: <strong style="color:var(--or-cyan);">ISS & TIANGONG PROTECTED</strong>
+    </div>
+  </div>
+
+  <!-- CENTER HEADER BRAND BADGE -->
+  <div id="header-title-badge">
+    <span>व्योम</span>
+    <span>VYOM LIVE INTERACTIVE DEMO</span>
+  </div>
+
+  <!-- MISSION CLOCK BAR -->
+  <div id="utc-clock-bar">
+    <span class="mission-label">MISSION CLOCK</span>
+    <span id="utc-clock">2026-09-03 18:17:00 UTC</span>
+  </div>
+
+  <!-- RIGHT SETTINGS HAMBURGER MENU BUTTON -->
+  <button id="right-hamburger-btn" class="hamburger-right" aria-label="Open settings menu">
+    ⚙️
+  </button>
+
+  <!-- RIGHT SLIDEOUT SETTINGS & OBJECT TELEMETRY PANEL -->
+  <div id="right-hamburger-panel" class="hamburger-panel-right open">
+    <div class="hm-section-label">OBJECT INTELLIGENCE & TELEMETRY</div>
+    
+    <div class="setting-toggle-row">
+      <span>NAME</span>
+      <strong id="obj-detail-name" style="color: var(--or-cyan);">Cartosat-3</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>NORAD ID</span>
+      <strong id="obj-detail-norad" style="color: #fff;">44804</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>TYPE</span>
+      <strong id="obj-detail-type" style="color: var(--or-emerald);">ACTIVE</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>OWNER / AGENCY</span>
+      <strong id="obj-detail-owner" style="color: var(--or-isro-gold);">ISRO (India)</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>ALTITUDE & REGIME</span>
+      <strong id="obj-detail-alt" style="color: #fff;">509 km (LEO)</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>VELOCITY</span>
+      <strong id="obj-detail-vel" style="color: #fff;">7.61 km/s</strong>
+    </div>
+
+    <div class="hm-section-label" style="margin-top:10px;">20-YEAR TRAJECTORY PREDICTION (2026 ➔ 2046)</div>
+    <div style="font-size: 11px; color: var(--or-yellow); margin-bottom: 4px;" id="predict-decay-year">
+      Predicted Re-Entry: Year 2041
+    </div>
+    <div class="sw-metrics-grid" id="decay-prediction-grid">
+      <!-- 20-Year Projections Injected Dynamic by app.js -->
+    </div>
+
+    <div class="hm-section-label" style="margin-top:10px;">SUB-SATELLITE GROUND TRACK</div>
+    <div class="setting-toggle-row">
+      <span>LATITUDE</span>
+      <strong id="subpoint-lat" style="color: var(--or-cyan);">12.97° N</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>LONGITUDE</span>
+      <strong id="subpoint-lon" style="color: var(--or-yellow);">77.59° E</strong>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE 3D COLLISION TIME-SLIDER SCRUBBER -->
+  <div id="time-slider-container">
+    <div class="ts-header">
+      <span>⏱️ 3D COLLISION TIME-SLIDER</span>
+      <span id="ts-offset-label" style="color: var(--or-yellow); font-weight:700;">TCA (0.0m LIVE)</span>
+    </div>
+    <div class="ts-controls-row">
+      <button class="ts-btn" id="btn-ts-rewind">◄◄ -10m</button>
+      <button class="ts-btn" id="btn-ts-play">PLAY</button>
+      <button class="ts-btn" id="btn-ts-ffwd">+10m ►►</button>
+      <input type="range" id="time-slider-range" min="-60" max="60" value="0" step="0.5">
+    </div>
+    <div class="ts-footer-info">
+      <span>INSTANT MISS DISTANCE: <strong id="ts-miss-dist" style="color:var(--or-cyan);">142.0 meters</strong></span>
+      <span id="ts-threat-badge" style="color:var(--or-red);">DEFCON 2 CRITICAL</span>
+    </div>
+  </div>
+
+  <!-- DEFCON THREAT LEVEL METER BAR -->
+  <div class="defcon-threat-meter">
+    <div class="defcon-label">
+      <span>SPACE THREAT LEVEL</span>
+      <span style="color: var(--or-red);">DEFCON 2</span>
+    </div>
+    <div class="defcon-segments">
+      <div class="defcon-seg active-5"></div>
+      <div class="defcon-seg active-3"></div>
+      <div class="defcon-seg active-2"></div>
+      <div class="defcon-seg"></div>
+      <div class="defcon-seg"></div>
+    </div>
+    <div style="font-size: 10px; color: var(--or-yellow);">
+      CRITICAL CONJUNCTION: Cartosat-3 vs. Fengyun-1C (142m)
+    </div>
+  </div>
+
+  <!-- SPACE WEATHER & ANOMALIES DRAWER -->
+  <div id="space-weather-panel">
+    <div class="sw-header">
+      <span>SPACE WEATHER & LEO DRAG</span>
+      <span>NOAA SWPC</span>
+    </div>
+    <div class="sw-metrics-grid">
+      <div class="sw-metric-box">
+        <div class="sw-metric-lbl">SOLAR WIND</div>
+        <div class="sw-metric-val">265 km/s</div>
+      </div>
+      <div class="sw-metric-box">
+        <div class="sw-metric-lbl">KP INDEX</div>
+        <div class="sw-metric-val" style="color: var(--or-emerald);">Kp 0 (G0)</div>
+      </div>
+    </div>
+
+    <!-- 2D B-Plane Radar -->
+    <div class="bplane-box">
+      <div style="font-size: 9px; color: rgba(255,255,255,0.6); font-family: var(--font-mono);">
+        2D B-PLANE ENCOUNTER RADAR
+      </div>
+      <canvas id="bplane-canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- FOOTER BAR -->
+  <footer class="footer-bar">
+    <div>
+      <span class="footer-status-dot"></span>
+      <span>VYOM LIVE DEMO // BHARATIYA ANTARIKSH HACKATHON</span>
+    </div>
+    <div>CELESTRAK, SPACE-TRACK & ESA TIRA LIVE DATA FEED</div>
+  </footer>
+
+  <script src="vyom/ui/app.js"></script>
+</body>
+</html>

@@ -5,6 +5,15 @@
 
 ---
 
+## 🌐 Live Interactive Demo Page
+
+👉 **[Launch Live Interactive Demo](https://YOUR_USERNAME.github.io/vyom-orbital-safety-simulator/)** *(Hosted via GitHub Pages)*  
+👉 **Local Demo File:** [`demo.html`](file:///Users/dhruvgupta/.gemini/antigravity/scratch/vyom-orbital-safety-simulator/demo.html)
+
+Anyone can open the live demo directly in their web browser without installing dependencies to explore the 3D space debris radar!
+
+---
+
 ## 🌟 Executive Summary
 
 **VYOM** ("Space Debris Tracking & Threat Intelligence System") is a web-based space situational awareness (SSA) radar dashboard designed to track cataloged objects ($>10\text{ cm}$) and micro-debris swarms ($1\text{ mm} - 10\text{ cm}$) across all Near-Earth space regimes (**LEO, MEO, GEO, and Graveyard Corridors**). 
@@ -94,13 +103,7 @@ Observe 3D cyan wireframe protective spheres surrounding the **ISS** and **Tiang
    python3 server.py 8080
    ```
 
-3. Start the Web Dashboard Server:
-   ```bash
-   cd ../ui
-   python3 -m http.server 8000
-   ```
-
-4. Open your browser and navigate to `http://localhost:8000`!
+3. Open `demo.html` or `index.html` in your browser!
 
 ---
 
