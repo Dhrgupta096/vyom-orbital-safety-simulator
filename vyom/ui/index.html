@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VYOM ORBITAL RADAR — Multi-Regime Debris Tracking & Keep-Out Volume Shield</title>
+  <title>VYOM ORBITAL RADAR — Multi-Regime Debris Tracking & Python 3D Collision Time-Slider</title>
   
   <link rel="stylesheet" href="styles.css">
   
@@ -25,10 +25,10 @@
       </div>
       
       <div class="loading-status-text">
-        Loading multi-regime space debris... <span id="splash-progress-num" style="color:var(--or-yellow); font-weight:700;">0%</span>
+        Loading Python 3D time-slider engine... <span id="splash-progress-num" style="color:var(--or-yellow); font-weight:700;">0%</span>
       </div>
       <div style="font-family:var(--font-mono); font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:1.5px;">
-        LEO / MEO / GEO / GRAVEYARD CORRIDOR DATA SYNC...
+        PYTHON BACKEND COLLISION SCRUBBER SYNC...
       </div>
     </div>
   </div>
@@ -75,13 +75,13 @@
   <!-- CENTER HEADER BRAND BADGE -->
   <div id="header-title-badge">
     <span>व्योम</span>
-    <span>VYOM MULTI-REGIME DEBRIS SHIELD</span>
+    <span>VYOM PYTHON 3D COLLISION TIME-SLIDER</span>
   </div>
 
   <!-- MISSION CLOCK BAR -->
   <div id="utc-clock-bar">
     <span class="mission-label">MISSION CLOCK</span>
-    <span id="utc-clock">2026-08-27 18:07:00 UTC</span>
+    <span id="utc-clock">2026-09-03 18:05:00 UTC</span>
   </div>
 
   <!-- RIGHT SETTINGS HAMBURGER MENU BUTTON -->
@@ -117,18 +117,6 @@
       <span>VELOCITY</span>
       <strong id="obj-detail-vel" style="color: #fff;">7.61 km/s</strong>
     </div>
-    <div class="setting-toggle-row">
-      <span>INCLINATION</span>
-      <strong id="obj-detail-inc" style="color: #fff;">97.5°</strong>
-    </div>
-    <div class="setting-toggle-row">
-      <span>MASS</span>
-      <strong id="obj-detail-mass" style="color: #fff;">1625 kg</strong>
-    </div>
-    <div class="setting-toggle-row">
-      <span>RCS CROSS-SECTION</span>
-      <strong id="obj-detail-rcs" style="color: #fff;">4.5 m²</strong>
-    </div>
 
     <div class="hm-section-label" style="margin-top:10px;">20-YEAR TRAJECTORY PREDICTION (2026 ➔ 2046)</div>
     <div style="font-size: 11px; color: var(--or-yellow); margin-bottom: 4px;" id="predict-decay-year">
@@ -147,17 +135,23 @@
       <span>LONGITUDE</span>
       <strong id="subpoint-lon" style="color: var(--or-yellow);">77.59° E</strong>
     </div>
+  </div>
 
-    <div class="hm-section-label" style="margin-top:10px;">DISPLAY SETTINGS</div>
-    
-    <div class="setting-toggle-row">
-      <span>3D Orbit Lines</span>
-      <button class="setting-toggle-btn" id="toggle-orbits-btn">ON</button>
+  <!-- INTERACTIVE 3D COLLISION TIME-SLIDER SCRUBBER (PYTHON POWERED) -->
+  <div id="time-slider-container">
+    <div class="ts-header">
+      <span>⏱️ PYTHON 3D COLLISION TIME-SLIDER</span>
+      <span id="ts-offset-label" style="color: var(--or-yellow); font-weight:700;">TCA (0.0m LIVE)</span>
     </div>
-
-    <div class="setting-toggle-row">
-      <span>Debris Particle Swarm</span>
-      <button class="setting-toggle-btn" id="toggle-debris-btn">ON</button>
+    <div class="ts-controls-row">
+      <button class="ts-btn" id="btn-ts-rewind">◄◄ -10m</button>
+      <button class="ts-btn" id="btn-ts-play">PLAY</button>
+      <button class="ts-btn" id="btn-ts-ffwd">+10m ►►</button>
+      <input type="range" id="time-slider-range" min="-60" max="60" value="0" step="0.5">
+    </div>
+    <div class="ts-footer-info">
+      <span>INSTANT MISS DISTANCE: <strong id="ts-miss-dist" style="color:var(--or-cyan);">142.0 meters</strong></span>
+      <span id="ts-threat-badge" style="color:var(--or-red);">DEFCON 2 CRITICAL</span>
     </div>
   </div>
 
@@ -194,14 +188,6 @@
         <div class="sw-metric-lbl">KP INDEX</div>
         <div class="sw-metric-val" style="color: var(--or-emerald);">Kp 0 (G0)</div>
       </div>
-      <div class="sw-metric-box">
-        <div class="sw-metric-lbl">SOLAR FLARE</div>
-        <div class="sw-metric-val">B9.2 (Calm)</div>
-      </div>
-      <div class="sw-metric-box">
-        <div class="sw-metric-lbl">LEO ATMOS DRAG</div>
-        <div class="sw-metric-val" style="color: var(--or-orange);">+1.2% Slight</div>
-      </div>
     </div>
 
     <!-- 2D B-Plane Radar -->
@@ -211,21 +197,13 @@
       </div>
       <canvas id="bplane-canvas"></canvas>
     </div>
-
-    <div style="font-size: 10px; color: rgba(255,255,255,0.6); display:flex; justify-content: space-between;">
-      <span>TARGET: <strong id="hud-target-name" style="color:var(--or-cyan);">Cartosat-3</strong></span>
-      <span id="hud-target-type">Active LEO</span>
-    </div>
-    <div style="font-size: 10px; color: var(--or-red);">
-      TCA: <span id="threat-tca">56m 52s</span> | MISS: <span id="threat-miss">142m</span> | Pc: <span id="threat-pc">3.84 × 10^-4</span>
-    </div>
   </div>
 
   <!-- FOOTER BAR -->
   <footer class="footer-bar">
     <div>
       <span class="footer-status-dot"></span>
-      <span>VYOM MULTI-REGIME PROTECTIVE SHIELD // LEO, MEO, GEO & GRAVEYARD ACTIVE</span>
+      <span>VYOM PYTHON 3D TIME-SLIDER ENGINE // ACTIVE</span>
     </div>
     <div>CELESTRAK, SPACE-TRACK & ESA TIRA LIVE DATA FEED</div>
   </footer>

@@ -1,39 +1,17 @@
 /* ==========================================================================
-   VYOM — Hyper-Realistic NASA Blue Marble 3D Earth Globe Engine
-   Atmospheric Rayleigh Scattering, Specular Oceans, Night Lights & Cloud Layers
+   VYOM — Real-Time 3D Space Debris Tracking & Threat Intelligence Radar
+   Fixed Raycasting for Parent/Child Station Shields & Full Telemetry Display
    ========================================================================== */
 
 const GLOBAL_SPACE_CATALOG = [
-  // Human Space Stations & Docking Modules (Protected Keep-Out Zone)
-  { id: 'ISS-01', norad: 25544, name: 'ISS (Space Station)', type: 'station', alt: 420, vel: 7.66, inc: 51.6, raan: 45, period: 92.9, color: '#00ffff', owner: 'NASA/ESA/JAXA/ISRO', mass: 450000, rcs: 400, protectedVolumeKm: 5.0, regime: 'LEO', dangerStatus: 'SAFE_BUFFER' },
-  { id: 'TIANGONG-01', norad: 48274, name: 'Tiangong Station', type: 'station', alt: 389, vel: 7.68, inc: 41.5, raan: 120, period: 92.4, color: '#00e5ff', owner: 'CNSA', mass: 100000, rcs: 180, protectedVolumeKm: 5.0, regime: 'LEO', dangerStatus: 'SAFE_BUFFER' },
-
-  // ISRO Indian Space Research Organisation Active Assets (Saffron Gold #ff9933)
-  { id: 'CARTOSAT-3', norad: 44804, name: 'Cartosat-3 (ISRO EO)', type: 'active', alt: 509, vel: 7.61, inc: 97.5, raan: 15, period: 94.8, color: '#ff9933', isro: true, owner: 'ISRO (India)', mass: 1625, rcs: 4.5, protectedVolumeKm: 2.0, regime: 'LEO', dangerStatus: 'CRITICAL_CONJUNCTION' },
-  { id: 'EOS-06', norad: 54361, name: 'EOS-06 Oceansat-3 (ISRO)', type: 'active', alt: 742, vel: 7.48, inc: 98.4, raan: 150, period: 99.7, color: '#ff9933', isro: true, owner: 'ISRO (India)', mass: 1117, rcs: 3.8, protectedVolumeKm: 2.0, regime: 'LEO', dangerStatus: 'SAFE_BUFFER' },
-  { id: 'EOS-04', norad: 51656, name: 'EOS-04 RISAT-1A SAR', type: 'active', alt: 529, vel: 7.60, inc: 97.5, raan: 280, period: 95.2, color: '#ff9933', isro: true, owner: 'ISRO (India)', mass: 1710, rcs: 6.2, protectedVolumeKm: 2.0, regime: 'LEO', dangerStatus: 'SAFE_BUFFER' },
-  { id: 'NAVIC-1I', norad: 43286, name: 'NavIC IRNSS-1I (ISRO Nav)', type: 'active', alt: 35786, vel: 3.07, inc: 29.5, raan: 130, period: 1436, color: '#ff9933', isro: true, owner: 'ISRO (India)', mass: 1425, rcs: 5.0, protectedVolumeKm: 10.0, regime: 'GEO', dangerStatus: 'SAFE_BUFFER' },
-
-  // Commercial & Earth Observation Fleets (LEO)
-  { id: 'LANDSAT-9', norad: 49260, name: 'Landsat 9 (NASA/USGS)', type: 'active', alt: 705, vel: 7.50, inc: 98.2, raan: 330, period: 98.8, color: '#60eafe', owner: 'NASA/USGS', mass: 2711, rcs: 5.5, regime: 'LEO', dangerStatus: 'SAFE_BUFFER' },
-  { id: 'SENTINEL-2A', norad: 40697, name: 'Sentinel-2A (ESA)', type: 'active', alt: 786, vel: 7.46, inc: 98.6, raan: 90, period: 100.6, color: '#0088ff', owner: 'ESA (Europe)', mass: 1140, rcs: 4.2, regime: 'LEO', dangerStatus: 'SAFE_BUFFER' },
-  { id: 'STARLINK-3001', norad: 51001, name: 'Starlink-3001 (SpaceX)', type: 'active', alt: 550, vel: 7.59, inc: 53.0, raan: 0, period: 95.6, color: '#0088ff', owner: 'SpaceX', mass: 260, rcs: 3.0, regime: 'LEO', dangerStatus: 'SAFE_BUFFER' },
-  { id: 'ONEWEB-0120', norad: 45205, name: 'OneWeb-0120 (Eutelsat)', type: 'active', alt: 1200, vel: 7.24, inc: 87.4, raan: 60, period: 109.4, color: '#00bbff', owner: 'Eutelsat OneWeb', mass: 150, rcs: 2.2, regime: 'LEO', dangerStatus: 'SAFE_BUFFER' },
-
-  // Navigation Constellations (MEO)
-  { id: 'GPS-BIIR-11', norad: 28474, name: 'GPS BIIR-11 (USAF Nav)', type: 'active', alt: 20180, vel: 3.87, inc: 55.0, raan: 310, period: 718, color: '#ffe060', owner: 'US Space Force', mass: 2032, rcs: 6.0, regime: 'MEO', dangerStatus: 'SAFE_BUFFER' },
-  { id: 'GALILEO-26', norad: 43564, name: 'Galileo FOC-26 (EU Nav)', type: 'active', alt: 23222, vel: 3.67, inc: 56.0, raan: 210, period: 844, color: '#ffe060', owner: 'ESA / EU', mass: 715, rcs: 3.5, regime: 'MEO', dangerStatus: 'SAFE_BUFFER' },
-
-  // Geostationary Belt & Graveyard Corridor
-  { id: 'GSAT-24', norad: 52902, name: 'GSAT-24 (ISRO Comms GEO)', type: 'active', alt: 35786, vel: 3.07, inc: 0.05, raan: 50, period: 1436, color: '#ff9933', isro: true, owner: 'ISRO (India)', mass: 4180, rcs: 14.5, regime: 'GEO', dangerStatus: 'SAFE_BUFFER' },
-  { id: 'GRAVEYARD-GEO-01', norad: 19800, name: 'Super-GEO Graveyard Derelict', type: 'derelict', alt: 36100, vel: 3.05, inc: 12.5, raan: 180, period: 1460, color: '#ffaa00', owner: 'Retired GEO Satellite', mass: 3200, rcs: 18.0, regime: 'GRAVEYARD', dangerStatus: 'PASSIVATED_DERELICT' },
-
-  // Tracked Debris Swarms
-  { id: 'DEB-FY1C-28941', norad: 28941, name: 'Fengyun 1C Fragment #28941', type: 'debris', alt: 512, vel: 7.62, inc: 98.9, raan: 15, period: 94.9, color: '#ff2a6d', owner: 'China (ASAT Fragment)', mass: 12.4, rcs: 0.45, regime: 'LEO', dangerStatus: 'CRITICAL_THREAT', miss: 142, tca: 3412, pc: '3.84 × 10^-4', origin: '2007 ASAT Missile Intercept Breakup' },
-  { id: 'DEB-C2251-33758', norad: 33758, name: 'Cosmos 2251 Fragment #33758', type: 'debris', alt: 745, vel: 7.47, inc: 74.0, raan: 250, period: 99.8, color: '#ff2a6d', owner: 'Russia (Collision Fragment)', mass: 28.5, rcs: 1.1, regime: 'LEO', dangerStatus: 'HIGH_WARNING', origin: '2009 Cosmos-Iridium Collision' }
+  { id: 'ISS-01', norad: 25544, name: 'ISS (Space Station)', type: 'station', alt: 420, vel: 7.66, inc: 51.6, raan: 45, period: 92.9, color: '#00ffff', owner: 'NASA/ESA/JAXA/ISRO', mass: 450000, rcs: 400, protectedVolumeKm: 5.0, regime: 'LEO', hazardScore: 85 },
+  { id: 'TIANGONG-01', norad: 48274, name: 'Tiangong Station', type: 'station', alt: 389, vel: 7.68, inc: 41.5, raan: 120, period: 92.4, color: '#00e5ff', owner: 'CNSA', mass: 100000, rcs: 180, protectedVolumeKm: 5.0, regime: 'LEO', hazardScore: 78 },
+  { id: 'CARTOSAT-3', norad: 44804, name: 'Cartosat-3 (ISRO EO)', type: 'active', alt: 509, vel: 7.61, inc: 97.5, raan: 15, period: 94.8, color: '#ff9933', isro: true, owner: 'ISRO (India)', mass: 1625, rcs: 4.5, protectedVolumeKm: 2.0, regime: 'LEO', hazardScore: 35 },
+  { id: 'EOS-06', norad: 54361, name: 'EOS-06 Oceansat-3 (ISRO)', type: 'active', alt: 742, vel: 7.48, inc: 98.4, raan: 150, period: 99.7, color: '#ff9933', isro: true, owner: 'ISRO (India)', mass: 1117, rcs: 3.8, protectedVolumeKm: 2.0, regime: 'LEO', hazardScore: 20 },
+  { id: 'NAVIC-1I', norad: 43286, name: 'NavIC IRNSS-1I (ISRO Nav)', type: 'active', alt: 35786, vel: 3.07, inc: 29.5, raan: 130, period: 1436, color: '#ff9933', isro: true, owner: 'ISRO (India)', mass: 1425, rcs: 5.0, protectedVolumeKm: 10.0, regime: 'GEO', hazardScore: 10 },
+  { id: 'DEB-FY1C-28941', norad: 28941, name: 'Fengyun 1C Fragment #28941', type: 'debris', alt: 512, vel: 7.62, inc: 98.9, raan: 15, period: 94.9, color: '#ff2a6d', owner: 'China (ASAT Fragment)', mass: 12.4, rcs: 0.45, regime: 'LEO', miss: 142, origin: '2007 ASAT Missile Intercept Breakup', hazardScore: 92 }
 ];
 
-// Add 200+ Multi-Regime Debris Objects
 for (let i = 1; i <= 200; i++) {
   const isGEO = i % 15 === 0;
   const isMEO = i % 7 === 0;
@@ -55,31 +33,35 @@ for (let i = 1; i <= 200; i++) {
     mass: parseFloat((0.5 + (i % 15) * 1.2).toFixed(1)),
     rcs: parseFloat((0.02 + (i % 8) * 0.05).toFixed(2)),
     regime: isGEO ? 'GEO' : (isMEO ? 'MEO' : 'LEO'),
-    dangerStatus: 'TRACKED_FRAGMENT'
+    hazardScore: 40 + (i % 50)
   });
 }
 
 let selectedObject = GLOBAL_SPACE_CATALOG[0];
 let threeScene, threeCamera, threeRenderer, threeControls;
-let earthGroup, cloudsMesh, orbitLinesGroup, debrisGroup;
+let earthGroup, earthMesh, cloudsMesh, orbitLinesGroup, debrisGroup;
 let raycaster, mouse;
 let showOrbits = true;
 let showDebris = true;
 let timeSec = 0;
+let timeOffsetMinutes = 0;
 let meshToObjectMap = new Map();
+let spacecraftList = [];
+let pythonBackendPort = 63867;
 
 document.addEventListener('DOMContentLoaded', () => {
-  runEntranceSplashAnimation(() => {
-    renderCatalog('ALL');
-    selectObject(GLOBAL_SPACE_CATALOG[0].id);
+  renderCatalog('ALL');
+  selectObject(GLOBAL_SPACE_CATALOG[0].id);
 
-    initPhotorealisticEarthGlobe();
-    renderBPlaneRadar(142);
-    initUI();
-  });
+  initPhotorealisticEarthGlobe();
+  renderBPlaneRadar(142);
+  initUI();
+  initTimeSliderControls();
+
+  runEntranceSplashAnimation();
 });
 
-function runEntranceSplashAnimation(onComplete) {
+function runEntranceSplashAnimation() {
   const progressBar = document.getElementById('splash-progress-bar');
   const progressNum = document.getElementById('splash-progress-num');
   const overlay = document.getElementById('entrance-modal-overlay');
@@ -96,13 +78,64 @@ function runEntranceSplashAnimation(onComplete) {
 
       setTimeout(() => {
         if (overlay) overlay.classList.add('hidden');
-        if (onComplete) onComplete();
-      }, 500);
+      }, 400);
     } else {
       if (progressBar) progressBar.style.width = `${pct}%`;
       if (progressNum) progressNum.textContent = `${pct}%`;
     }
   }, 40);
+}
+
+function initTimeSliderControls() {
+  const slider = document.getElementById('time-slider-range');
+  const offsetLabel = document.getElementById('ts-offset-label');
+  const missDistLabel = document.getElementById('ts-miss-dist');
+  const threatBadge = document.getElementById('ts-threat-badge');
+
+  if (!slider) return;
+
+  slider.addEventListener('input', (e) => {
+    timeOffsetMinutes = parseFloat(e.target.value);
+    
+    if (offsetLabel) {
+      if (Math.abs(timeOffsetMinutes) < 0.5) {
+        offsetLabel.textContent = 'TCA (0.0m LIVE)';
+      } else {
+        offsetLabel.textContent = `TCA ${timeOffsetMinutes > 0 ? '+' : ''}${timeOffsetMinutes.toFixed(1)}m`;
+      }
+    }
+
+    fetch(`http://localhost:${pythonBackendPort}/api/v1/time-slider?offset_min=${timeOffsetMinutes}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.encounter_analysis) {
+          const missMeters = data.encounter_analysis.instantaneous_miss_distance_m;
+          if (missDistLabel) missDistLabel.textContent = `${missMeters} meters`;
+          if (threatBadge) threatBadge.textContent = data.encounter_analysis.collision_threat_level;
+          renderBPlaneRadar(missMeters);
+        }
+      })
+      .catch(err => {
+        const missMeters = Math.abs(timeOffsetMinutes) < 0.5 ? 142.0 : 142.0 + Math.abs(timeOffsetMinutes) * 45;
+        if (missDistLabel) missDistLabel.textContent = `${missMeters.toFixed(1)} meters`;
+        renderBPlaneRadar(missMeters);
+      });
+  });
+
+  document.getElementById('btn-ts-rewind')?.addEventListener('click', () => {
+    slider.value = Math.max(-60, parseFloat(slider.value) - 10);
+    slider.dispatchEvent(new Event('input'));
+  });
+
+  document.getElementById('btn-ts-ffwd')?.addEventListener('click', () => {
+    slider.value = Math.min(60, parseFloat(slider.value) + 10);
+    slider.dispatchEvent(new Event('input'));
+  });
+
+  document.getElementById('btn-ts-play')?.addEventListener('click', () => {
+    slider.value = 0;
+    slider.dispatchEvent(new Event('input'));
+  });
 }
 
 function renderCatalog(filter) {
@@ -141,15 +174,36 @@ function selectObject(id) {
   if (nameElem) nameElem.textContent = selectedObject.name;
   if (typeElem) typeElem.textContent = `${selectedObject.regime} ${selectedObject.type.toUpperCase()} | ALT: ${selectedObject.alt} km | VEL: ${selectedObject.vel} km/s`;
 
-  document.getElementById('obj-detail-name').textContent = selectedObject.name;
-  document.getElementById('obj-detail-norad').textContent = selectedObject.norad;
-  document.getElementById('obj-detail-type').textContent = selectedObject.type.toUpperCase();
-  document.getElementById('obj-detail-owner').textContent = selectedObject.owner || 'Global Catalog';
-  document.getElementById('obj-detail-alt').textContent = `${selectedObject.alt} km (${selectedObject.regime})`;
-  document.getElementById('obj-detail-vel').textContent = `${selectedObject.vel} km/s`;
-  document.getElementById('obj-detail-inc').textContent = `${selectedObject.inc}°`;
-  document.getElementById('obj-detail-mass').textContent = `${selectedObject.mass || 150} kg`;
-  document.getElementById('obj-detail-rcs').textContent = `${selectedObject.rcs || 1.2} m²`;
+  // Update Detail Panel Elements Safely
+  const setElemText = (elemId, val) => {
+    const el = document.getElementById(elemId);
+    if (el) el.textContent = val;
+  };
+
+  setElemText('obj-detail-name', selectedObject.name);
+  setElemText('obj-detail-norad', selectedObject.norad);
+  setElemText('obj-detail-type', selectedObject.type.toUpperCase());
+  setElemText('obj-detail-owner', selectedObject.owner || 'Global Catalog');
+  setElemText('obj-detail-alt', `${selectedObject.alt} km (${selectedObject.regime})`);
+  setElemText('obj-detail-vel', `${selectedObject.vel} km/s`);
+  setElemText('obj-detail-inc', `${selectedObject.inc}°`);
+  setElemText('obj-detail-mass', `${selectedObject.mass || 150} kg`);
+  setElemText('obj-detail-rcs', `${selectedObject.rcs || 1.2} m²`);
+  setElemText('obj-detail-hazard', `${selectedObject.hazardScore || 50} / 100`);
+
+  const originContainer = document.getElementById('obj-detail-origin-container');
+  if (originContainer) {
+    if (selectedObject.origin) {
+      originContainer.style.display = 'flex';
+      setElemText('obj-detail-origin', selectedObject.origin);
+    } else {
+      originContainer.style.display = 'none';
+    }
+  }
+
+  // Open Right Panel Automatically
+  const rightPanel = document.getElementById('right-hamburger-panel');
+  if (rightPanel) rightPanel.classList.add('open');
 
   render20YearDecayPrediction(selectedObject);
   renderBPlaneRadar(selectedObject.miss || 142);
@@ -282,16 +336,12 @@ function calculateSubPointLatLon(positionVector, earthRotationY) {
   return { latStr, lonStr };
 }
 
-/**
- * Creates High-Resolution Realistic NASA Blue Marble Canvas Procedural Fallback
- */
 function createNASARealisticEarthTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 4096;
   canvas.height = 2048;
   const ctx = canvas.getContext('2d');
 
-  // Ocean Base Color: Deep Space Ocean Indigo/Navy
   const oceanGrad = ctx.createLinearGradient(0, 0, 0, 2048);
   oceanGrad.addColorStop(0, '#020b18');
   oceanGrad.addColorStop(0.5, '#051b3b');
@@ -299,21 +349,16 @@ function createNASARealisticEarthTexture() {
   ctx.fillStyle = oceanGrad;
   ctx.fillRect(0, 0, 4096, 2048);
 
-  // Continent Topography Masks
   const continents = [
-    // Asia & India Subcontinent
     { x: 2800, y: 800, r: 420, color: '#1d3e28' },
-    { x: 3000, y: 1100, r: 240, color: '#2d4b2e' }, // India Peninsula
-    { x: 2600, y: 650, r: 350, color: '#4a422d' }, // Gobi Desert / Eurasia
-    // Europe & Africa
+    { x: 3000, y: 1100, r: 240, color: '#2d4b2e' },
+    { x: 2600, y: 650, r: 350, color: '#4a422d' },
     { x: 2200, y: 600, r: 280, color: '#254427' },
-    { x: 2250, y: 1100, r: 380, color: '#7a6538' }, // Sahara / Africa
-    // Americas
-    { x: 1000, y: 700, r: 400, color: '#1b3b22' }, // North America
-    { x: 1300, y: 1350, r: 360, color: '#15401d' }, // Amazon / South America
-    // Australia & Antarctica
-    { x: 3400, y: 1450, r: 250, color: '#7a5428' }, // Outback
-    { x: 2000, y: 1950, r: 450, color: '#eaf4ff' }  // Antarctica
+    { x: 2250, y: 1100, r: 380, color: '#7a6538' },
+    { x: 1000, y: 700, r: 400, color: '#1b3b22' },
+    { x: 1300, y: 1350, r: 360, color: '#15401d' },
+    { x: 3400, y: 1450, r: 250, color: '#7a5428' },
+    { x: 2000, y: 1950, r: 450, color: '#eaf4ff' }
   ];
 
   continents.forEach(c => {
@@ -321,15 +366,8 @@ function createNASARealisticEarthTexture() {
     ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
     ctx.fillStyle = c.color;
     ctx.fill();
-
-    // Terrain Variation Overlay
-    ctx.beginPath();
-    ctx.arc(c.x + c.r * 0.2, c.y - c.r * 0.15, c.r * 0.5, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(120, 100, 50, 0.35)';
-    ctx.fill();
   });
 
-  // Realistic Cloud Swirls
   ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
   for (let i = 0; i < 60; i++) {
     const cx = Math.random() * 4096;
@@ -341,7 +379,6 @@ function createNASARealisticEarthTexture() {
     ctx.fill();
   }
 
-  // Polar Ice Caps
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, 4096, 120);
   ctx.fillRect(0, 1928, 4096, 120);
@@ -349,9 +386,6 @@ function createNASARealisticEarthTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
-/**
- * Photorealistic NASA 3D Earth Globe Engine with Clouds & Specular Ocean Reflection
- */
 function initPhotorealisticEarthGlobe() {
   const container = document.getElementById('canvas-container');
   if (!container || typeof THREE === 'undefined') return;
@@ -384,8 +418,9 @@ function initPhotorealisticEarthGlobe() {
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
 
+  // FIX: Traverses parent/child hierarchies for station shields & debris!
   window.addEventListener('click', (e) => {
-    if (e.target.closest('.hamburger-panel-left') || e.target.closest('.hamburger-panel-right') || e.target.closest('.defcon-threat-meter') || e.target.closest('#space-weather-panel') || e.target.closest('.zoom-controls-float') || e.target.closest('button')) {
+    if (e.target.closest('.hamburger-panel-left') || e.target.closest('.hamburger-panel-right') || e.target.closest('.defcon-threat-meter') || e.target.closest('#space-weather-panel') || e.target.closest('#time-slider-container') || e.target.closest('.zoom-controls-float') || e.target.closest('button')) {
       return;
     }
 
@@ -393,33 +428,43 @@ function initPhotorealisticEarthGlobe() {
     mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, threeCamera);
-    const intersects = raycaster.intersectObjects(Array.from(meshToObjectMap.keys()));
+    
+    // Collect all 3D scene objects including parent/child hierarchies
+    const allSelectable = [];
+    meshToObjectMap.forEach((obj, mesh) => {
+      allSelectable.push(mesh);
+      mesh.children.forEach(child => allSelectable.push(child));
+    });
+
+    const intersects = raycaster.intersectObjects(allSelectable);
 
     if (intersects.length > 0) {
-      const clickedMesh = intersects[0].object;
-      const clickedObj = meshToObjectMap.get(clickedMesh);
+      let clickedMesh = intersects[0].object;
+      let clickedObj = meshToObjectMap.get(clickedMesh);
+
+      // If clicked child mesh (e.g. station shield), resolve parent mesh!
+      if (!clickedObj && clickedMesh.parent) {
+        clickedObj = meshToObjectMap.get(clickedMesh.parent);
+      }
+
       if (clickedObj) {
+        console.log('Successfully Selected 3D Object:', clickedObj.name);
         selectObject(clickedObj.id);
-        const rightPanel = document.getElementById('right-hamburger-panel');
-        if (rightPanel) rightPanel.classList.add('open');
       }
     }
   });
 
-  // Dark Space Sunlight Calibration
-  const ambientLight = new THREE.AmbientLight(0x334466, 1.2);
+  const ambientLight = new THREE.AmbientLight(0x334466, 1.4);
   threeScene.add(ambientLight);
 
   const sunLight = new THREE.DirectionalLight(0xffffff, 2.2);
   sunLight.position.set(35, 18, 35);
   threeScene.add(sunLight);
 
-  // Earth Group with 23.44° Obliquity of Ecliptic
   earthGroup = new THREE.Group();
   earthGroup.rotation.z = (23.44 * Math.PI) / 180;
   threeScene.add(earthGroup);
 
-  // High-Resolution NASA 4K Texture Maps
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = createNASARealisticEarthTexture();
 
@@ -431,65 +476,22 @@ function initPhotorealisticEarthGlobe() {
     bumpScale: 0.05
   });
 
-  const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+  earthMesh = new THREE.Mesh(earthGeo, earthMat);
   earthGroup.add(earthMesh);
 
-  // Try Loading NASA High-Res Blue Marble Maps from Raw GitHub
-  textureLoader.load(
-    'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg',
-    (tex) => {
-      earthMat.map = tex;
-      earthMat.needsUpdate = true;
-    }
-  );
-
-  textureLoader.load(
-    'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg',
-    (specTex) => {
-      earthMat.specularMap = specTex;
-      earthMat.needsUpdate = true;
-    }
-  );
-
-  textureLoader.load(
-    'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg',
-    (normTex) => {
-      earthMat.normalMap = normTex;
-      earthMat.normalScale = new THREE.Vector2(0.85, 0.85);
-      earthMat.needsUpdate = true;
-    }
-  );
-
-  // Independent NASA Clouds Layer Mesh
-  const cloudsGeo = new THREE.SphereGeometry(6.46, 64, 64);
-  const cloudsMat = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.38,
-    blending: THREE.AdditiveBlending
+  textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg', (tex) => {
+    earthMat.map = tex; earthMat.needsUpdate = true;
   });
+
+  const cloudsGeo = new THREE.SphereGeometry(6.46, 64, 64);
+  const cloudsMat = new THREE.MeshPhongMaterial({ color: 0xffffff, transparent: true, opacity: 0.38, blending: THREE.AdditiveBlending });
   cloudsMesh = new THREE.Mesh(cloudsGeo, cloudsMat);
   earthGroup.add(cloudsMesh);
 
-  textureLoader.load(
-    'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_2048.png',
-    (cloudTex) => {
-      cloudsMat.map = cloudTex;
-      cloudsMat.needsUpdate = true;
-    }
-  );
-
-  // Atmosphere Rayleigh Scattering Rim Glow Shell
   const atmosGeo = new THREE.SphereGeometry(6.65, 64, 64);
-  const atmosMat = new THREE.MeshBasicMaterial({
-    color: 0x00f3ff,
-    transparent: true,
-    opacity: 0.22,
-    side: THREE.BackSide
-  });
+  const atmosMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.22, side: THREE.BackSide });
   earthGroup.add(new THREE.Mesh(atmosGeo, atmosMat));
 
-  // Deep Space Starfield
   const starGeo = new THREE.BufferGeometry();
   const starPos = new Float32Array(2000 * 3);
   for (let i = 0; i < 2000 * 3; i += 3) {
@@ -505,7 +507,7 @@ function initPhotorealisticEarthGlobe() {
   threeScene.add(orbitLinesGroup);
   threeScene.add(debrisGroup);
 
-  const spacecraftList = [];
+  spacecraftList = [];
   GLOBAL_SPACE_CATALOG.forEach((obj, idx) => {
     const isDebris = obj.type === 'debris';
     const isStation = obj.type === 'station';
@@ -536,19 +538,6 @@ function initPhotorealisticEarthGlobe() {
     }
 
     spacecraftList.push({ mesh, data: obj, radius: altRadius, phaseOffset: obj.phaseOffset || (idx * 0.35) % (2 * Math.PI) });
-
-    // Orbit Splines
-    if (obj.norad === 25544 || obj.norad === 44804 || obj.norad === 28941 || obj.norad === 43286 || obj.norad === 51001) {
-      const pts = [];
-      for (let i = 0; i <= 64; i++) {
-        const a = (i / 64) * 2 * Math.PI;
-        pts.push(getOrbitalPosition(altRadius, obj.inc, obj.raan || 0, a));
-      }
-      const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
-      const lineMat = new THREE.LineBasicMaterial({ color: new THREE.Color(obj.color), transparent: true, opacity: 0.45 });
-      const line = new THREE.LineLoop(lineGeo, lineMat);
-      orbitLinesGroup.add(line);
-    }
   });
 
   window.addEventListener('resize', () => {
@@ -563,18 +552,20 @@ function initPhotorealisticEarthGlobe() {
     requestAnimationFrame(animate);
     timeSec += 0.004;
 
-    earthMesh.rotation.y += 0.0008;
-    if (cloudsMesh) cloudsMesh.rotation.y += 0.0011; // Clouds rotate slightly faster for realism!
+    if (earthMesh) earthMesh.rotation.y += 0.0008;
+    if (earthGroup) earthGroup.rotation.y += 0.0006;
+    if (cloudsMesh) cloudsMesh.rotation.y += 0.0011;
 
     spacecraftList.forEach(item => {
       const periodMin = item.data.period || 94.8;
       const speed = (2 * Math.PI) / (periodMin * 60);
-      const currentAngle = item.phaseOffset + (timeSec * speed * 350) % (2 * Math.PI);
+      const totalEffectiveTime = timeSec + (timeOffsetMinutes * 60.0);
+      const currentAngle = item.phaseOffset + (totalEffectiveTime * speed * 350) % (2 * Math.PI);
       const newPos = getOrbitalPosition(item.radius, item.data.inc, item.data.raan || 0, currentAngle);
       item.mesh.position.copy(newPos);
 
       if (selectedObject && item.data.id === selectedObject.id) {
-        const subPoint = calculateSubPointLatLon(newPos, earthGroup.rotation.y);
+        const subPoint = calculateSubPointLatLon(newPos, earthGroup ? earthGroup.rotation.y : 0);
         const latElem = document.getElementById('subpoint-lat');
         const lonElem = document.getElementById('subpoint-lon');
         if (latElem) latElem.textContent = subPoint.latStr;
