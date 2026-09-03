@@ -12,7 +12,7 @@
 
 ### 👥 Team Members (Dayananda Sagar University):
 - 👨‍💻 **Dhruv Gupta**
-- 👩‍💻 **Ayushi J**
+- 👩‍💻 **Ayushi Jha**
 - 👨‍💻 **Dhanush J**
 - 👩‍💻 **Kamya**
 
