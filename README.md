@@ -20,10 +20,10 @@
 
 ## 🌐 Live Interactive Demo Page
 
-👉 **[Launch Live Interactive Demo](https://YOUR_USERNAME.github.io/vyom-orbital-safety-simulator/)** *(Hosted via GitHub Pages)*  
-👉 **Local Demo File:** [`demo.html`](file:///Users/dhruvgupta/.gemini/antigravity/scratch/vyom-orbital-safety-simulator/demo.html)
+👉 **[Launch Live Interactive Demo](https://dhrgupta096.github.io/vyom-orbital-safety-simulator/)** *(Hosted via GitHub Pages)*  
+👉 **Local Demo File:** [`demo.html`](./demo.html)
 
-Anyone can open the live demo directly in their web browser without installing dependencies to explore the 3D space debris radar!
+> ⚠️ **Note on Live Demo:** The hosted live demo is currently experiencing issues / undergoing maintenance when running without the Python 3 physics backend. For the full interactive experience (3D Collision Time-Slider API, SGP4 orbital telemetry, and real-time conjunction analysis), please run VYOM locally on **`http://localhost:8080`** using the Quick Start instructions below.
 
 ---
 
@@ -106,17 +106,16 @@ Observe 3D cyan wireframe protective spheres surrounding the **ISS** and **Tiang
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/vyom-orbital-safety-simulator.git
+   git clone https://github.com/Dhrgupta096/vyom-orbital-safety-simulator.git
    cd vyom-orbital-safety-simulator
    ```
 
-2. Start the Python 3 Backend Physics Server:
+2. Start the Python 3 Backend Physics Server on `localhost:8080`:
    ```bash
-   cd vyom/backend
-   python3 server.py 8080
+   python3 vyom/backend/server.py 8080
    ```
 
-3. Open `demo.html` or `index.html` in your browser!
+3. Open **`http://localhost:8080`** (or `http://localhost:8080/demo.html`) in your browser!
 
 ---
 

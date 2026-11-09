@@ -59,6 +59,9 @@
       <button class="tab-btn active" data-tab="ALL">ALL</button>
       <button class="tab-btn" data-tab="ACTIVE">ACTIVE</button>
       <button class="tab-btn" data-tab="DEBRIS">DEBRIS</button>
+      <button class="tab-btn" data-tab="GEO">GEO</button>
+      <button class="tab-btn" data-tab="ISRO">ISRO 🇮🇳</button>
+      <button class="tab-btn" data-tab="GROUND">GROUND 📡</button>
     </div>
 
     <div class="hm-section-label">NEARBY SPACE OBJECT CATALOG</div>
@@ -116,6 +119,40 @@
     <div class="setting-toggle-row">
       <span>VELOCITY</span>
       <strong id="obj-detail-vel" style="color: #fff;">7.61 km/s</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>INCLINATION</span>
+      <strong id="obj-detail-inc" style="color: #fff;">97.5°</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>MASS</span>
+      <strong id="obj-detail-mass" style="color: #fff;">1625 kg</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>RADAR CROSS SECTION</span>
+      <strong id="obj-detail-rcs" style="color: #fff;">4.5 m²</strong>
+    </div>
+    <div class="setting-toggle-row">
+      <span>HAZARD SCORE</span>
+      <strong id="obj-detail-hazard" style="color: var(--or-red);">35 / 100</strong>
+    </div>
+    <div class="setting-toggle-row" id="obj-detail-origin-container" style="display:none;">
+      <span>ORIGIN</span>
+      <strong id="obj-detail-origin" style="color: var(--or-yellow); font-size:10px;">ASAT Missile Intercept</strong>
+    </div>
+
+    <div class="hm-section-label" style="margin-top:10px;">3D DISPLAY LAYERS</div>
+    <div class="setting-toggle-row">
+      <span>ORBIT TRAJECTORY LINES</span>
+      <button class="setting-toggle-btn" id="toggle-orbits-btn">ON</button>
+    </div>
+    <div class="setting-toggle-row">
+      <span>DEBRIS FIELD PARTICLES</span>
+      <button class="setting-toggle-btn" id="toggle-debris-btn">ON</button>
+    </div>
+    <div class="setting-toggle-row">
+      <span>GEO GROUND STATIONS</span>
+      <button class="setting-toggle-btn" id="toggle-stations-btn">ON</button>
     </div>
 
     <div class="hm-section-label" style="margin-top:10px;">20-YEAR TRAJECTORY PREDICTION (2026 ➔ 2046)</div>
