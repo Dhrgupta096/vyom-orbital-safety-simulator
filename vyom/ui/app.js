@@ -719,23 +719,24 @@ function createNASARealisticEarthTexture() {
 
 function createNASACloudTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 2048;
-  canvas.height = 1024;
+  canvas.width = 1024;
+  canvas.height = 512;
   const ctx = canvas.getContext('2d');
 
-  ctx.fillStyle = 'rgba(0,0,0,0)';
-  ctx.fillRect(0, 0, 2048, 1024);
+  ctx.clearRect(0, 0, 1024, 512);
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-  for (let i = 0; i < 90; i++) {
-    const cx = Math.random() * 2048;
-    const cy = 100 + Math.random() * 824;
-    const rx = 120 + Math.random() * 240;
-    const ry = 30 + Math.random() * 45;
-    const rot = (Math.random() - 0.5) * 0.4;
-
+  // Soft wispy atmospheric cloud bands (fallback until NASA 1024px cloud map loads)
+  for (let i = 0; i < 45; i++) {
+    const cx = Math.random() * 1024;
+    const cy = 60 + Math.random() * 392;
+    const r = 40 + Math.random() * 70;
+    const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, r);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.18)');
+    grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.07)');
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.ellipse(cx, cy, rx, ry, rot, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -824,9 +825,6 @@ function createGroundStationsOnGlobe() {
     threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     threeRenderer.setSize(width, height);
     threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    if (threeRenderer.outputEncoding !== undefined) {
-      threeRenderer.outputEncoding = THREE.sRGBEncoding;
-    }
     container.appendChild(threeRenderer.domElement);
 
     if (typeof THREE.OrbitControls !== 'undefined') {
@@ -879,20 +877,24 @@ function createGroundStationsOnGlobe() {
     });
 
     // Photorealistic High-Contrast Solar & Ambient Deep-Space Lighting
-    const ambientLight = new THREE.AmbientLight(0x223355, 1.2);
+    const ambientLight = new THREE.AmbientLight(0x334868, 1.35);
     threeScene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 2.2);
     sunLight.position.set(40, 20, 40);
     threeScene.add(sunLight);
 
-    const rimLight = new THREE.DirectionalLight(0x00f3ff, 0.8);
+    const rimLight = new THREE.DirectionalLight(0x00c8ff, 0.5);
     rimLight.position.set(-40, -10, -30);
     threeScene.add(rimLight);
 
+    // Outer tilt group holds Earth's fixed 23.44° axial obliquity so spinning never wobbles
+    const earthTiltGroup = new THREE.Group();
+    earthTiltGroup.rotation.z = (23.44 * Math.PI) / 180;
+    threeScene.add(earthTiltGroup);
+
     earthGroup = new THREE.Group();
-    earthGroup.rotation.z = (23.44 * Math.PI) / 180;
-    threeScene.add(earthGroup);
+    earthTiltGroup.add(earthGroup);
 
     const textureLoader = new THREE.TextureLoader();
     const proceduralEarthTex = createNASARealisticEarthTexture();
@@ -900,57 +902,57 @@ function createGroundStationsOnGlobe() {
     const earthGeo = new THREE.SphereGeometry(6.37, 64, 64);
     const earthMat = new THREE.MeshPhongMaterial({
       map: proceduralEarthTex,
-      specular: new THREE.Color(0x3366aa),
-      shininess: 40,
+      specular: new THREE.Color(0x2a5588),
+      shininess: 28,
       bumpScale: 0.04
     });
 
     earthMesh = new THREE.Mesh(earthGeo, earthMat);
     earthGroup.add(earthMesh);
 
-    // Load High-Res Satellite Maps from Reliable CDN with Procedural Fallback
-    textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg', (tex) => {
+    // Load High-Res NASA Satellite Maps from Fast jsDelivr CDN (with Blue Marble upgrade)
+    textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/textures/planets/earth_atmos_2048.jpg', (tex) => {
       earthMat.map = tex;
       earthMat.needsUpdate = true;
     }, undefined, () => {
-      textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/planets/earth_atmos_2048.jpg', (fallbackTex) => {
+      textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg', (fallbackTex) => {
         earthMat.map = fallbackTex;
         earthMat.needsUpdate = true;
       });
     });
 
-    textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/planets/earth_specular_2048.jpg', (specTex) => {
+    textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/textures/planets/earth_specular_2048.jpg', (specTex) => {
       earthMat.specularMap = specTex;
       earthMat.needsUpdate = true;
     });
 
-    textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/planets/earth_normal_2048.jpg', (normalTex) => {
+    textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/textures/planets/earth_normal_2048.jpg', (normalTex) => {
       earthMat.normalMap = normalTex;
-      earthMat.normalScale = new THREE.Vector2(0.85, 0.85);
+      earthMat.normalScale = new THREE.Vector2(0.5, 0.5);
       earthMat.needsUpdate = true;
     });
 
-    // Swirling Realistic Cloud Sphere
-    const cloudsGeo = new THREE.SphereGeometry(6.44, 64, 64);
+    // Swirling Realistic NASA Cloud Sphere
+    const cloudsGeo = new THREE.SphereGeometry(6.43, 64, 64);
     const proceduralCloudsTex = createNASACloudTexture();
     const cloudsMat = new THREE.MeshPhongMaterial({
       map: proceduralCloudsTex,
       color: 0xffffff,
       transparent: true,
-      opacity: 0.42,
-      blending: THREE.AdditiveBlending
+      opacity: 0.36,
+      depthWrite: false
     });
 
     cloudsMesh = new THREE.Mesh(cloudsGeo, cloudsMat);
-    earthGroup.add(cloudsMesh);
+    earthTiltGroup.add(cloudsMesh);
 
-    textureLoader.load('https://unpkg.com/three-globe/example/img/earth-clouds.png', (cloudTex) => {
+    textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/textures/planets/earth_clouds_1024.png', (cloudTex) => {
       cloudsMat.map = cloudTex;
       cloudsMat.needsUpdate = true;
     });
 
-    // Rayleigh Atmospheric Scattering Halo Glow Shader (Fresnel Limb Effect)
-    const atmosGeo = new THREE.SphereGeometry(6.68, 64, 64);
+    // Rayleigh Atmospheric Scattering Limb Halo Shader
+    const atmosGeo = new THREE.SphereGeometry(6.52, 64, 64);
     const atmosShader = {
       vertexShader: `
       varying vec3 vNormal;
@@ -962,8 +964,9 @@ function createGroundStationsOnGlobe() {
       fragmentShader: `
       varying vec3 vNormal;
       void main() {
-        float intensity = pow(0.66 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.8);
-        gl_FragColor = vec4(0.0, 0.85, 1.0, 1.0) * intensity;
+        float viewDot = max(0.0, dot(vNormal, vec3(0.0, 0.0, 1.0)));
+        float rim = pow(1.0 - viewDot, 3.8);
+        gl_FragColor = vec4(0.15, 0.72, 1.0, rim * 0.55);
       }
     `
     };
@@ -972,10 +975,11 @@ function createGroundStationsOnGlobe() {
       vertexShader: atmosShader.vertexShader,
       fragmentShader: atmosShader.fragmentShader,
       blending: THREE.AdditiveBlending,
-      side: THREE.BackSide,
-      transparent: true
+      side: THREE.FrontSide,
+      transparent: true,
+      depthWrite: false
     });
-    earthGroup.add(new THREE.Mesh(atmosGeo, atmosMat));
+    earthTiltGroup.add(new THREE.Mesh(atmosGeo, atmosMat));
 
     // Initialize GEO Ground Stations on 3D Earth Surface
     createGroundStationsOnGlobe();
@@ -1058,11 +1062,10 @@ function createGroundStationsOnGlobe() {
       requestAnimationFrame(animate);
       timeSec += 0.003;
 
-      // Earth Rotation Rate (1 revolution per 24h = 7.292e-5 rad/s)
+      // Earth Rotation around its tilted axis (ground stations & continents locked together)
       const earthRotSpeed = 0.0006;
-      if (earthMesh) earthMesh.rotation.y += earthRotSpeed;
-      if (earthGroup) earthGroup.rotation.y += earthRotSpeed * 0.75;
-      if (cloudsMesh) cloudsMesh.rotation.y += earthRotSpeed * 1.35;
+      if (earthGroup) earthGroup.rotation.y += earthRotSpeed;
+      if (cloudsMesh) cloudsMesh.rotation.y += earthRotSpeed * 1.18;
 
       spacecraftList.forEach(item => {
         // True orbital period in minutes (LEO ~92m, MEO ~718m, GEO = 1436m)

@@ -154,6 +154,12 @@ except ImportError:
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=UI_DIR, **kwargs)
 
+        def end_headers(self):
+            self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+            super().end_headers()
+
         def _set_headers(self, status=200):
             self.send_response(status)
             self.send_header('Content-type', 'application/json')
@@ -166,6 +172,12 @@ except ImportError:
             self._set_headers(200)
 
         def do_GET(self):
+            # Strip conditional caching headers so browser never reuses another project's cached localhost:8080 page
+            if 'If-Modified-Since' in self.headers:
+                del self.headers['If-Modified-Since']
+            if 'If-None-Match' in self.headers:
+                del self.headers['If-None-Match']
+
             parsed_path = urlparse(self.path)
             
             if parsed_path.path == '/api/v1/time-slider':
